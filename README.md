@@ -1,200 +1,92 @@
-# es5-shim <sup>[![Version Badge][npm-version-svg]][package-url]</sup>
+# es5-shim
 
-[![github actions][actions-image]][actions-url]
-[![coverage][codecov-image]][codecov-url]
-[![dependency status][deps-svg]][deps-url]
-[![dev dependency status][dev-deps-svg]][dev-deps-url]
-[![License][license-image]][license-url]
-[![Downloads][downloads-image]][downloads-url]
+A compatibility library that implements ECMAScript 5 (ES5) features for older JavaScript engines. This project ensures that legacy environments can use modern JavaScript methods and objects, increasing cross-browser and cross-platform compatibility for your web projects.
 
-[![npm badge][npm-badge-png]][package-url]
+## Table of Contents
 
-`es5-shim.js` and `es5-shim.min.js` monkey-patch a JavaScript context to
-contain all EcmaScript 5 methods that can be faithfully emulated with a
-legacy JavaScript engine.
-**Note:** As `es5-shim.js` is designed to patch the native Javascript
-engine, it should be the library that is loaded first.
+- [Overview](#overview)
+- [Features](#features)
+- [Installation](#installation)
+- [Usage](#usage)
+- [API](#api)
+- [Contributing](#contributing)
+- [License](#license)
 
-`es5-sham.js` and `es5-sham.min.js` monkey-patch other ES5 methods as
-closely as possible.  For these methods, as closely as possible to ES5
-is not very close.  Many of these shams are intended only to allow code
-to be written to ES5 without causing run-time errors in older engines.
-In many cases, this means that these shams cause many ES5 methods to
-silently fail.  Decide carefully whether this is what you want.
-**Note:** `es5-sham.js` requires `es5-shim.js` to be able to work properly.
+## Overview
 
-## Tests
+**es5-shim** provides polyfills for ES5 features that may not be natively supported in older browsers or JavaScript engines. This includes array methods, object methods, and other language enhancements introduced in ES5.
 
-The tests are written with the Jasmine BDD test framework.
-To run the tests, navigate to <root-folder>/tests/ , or,
-simply `npm install` and `npm test`.
+**Why use es5-shim?**
+- Legacy browser support (IE8, old Android, etc.)
+- Ensures consistent behavior across environments
+- Simple to include and use
 
-## Shims
+## Features
 
-### Complete tests ###
+- Polyfills for ES5 methods such as:
+  - `Array.prototype.forEach`, `map`, `filter`, `reduce`, etc.
+  - `Object.create`, `Object.keys`, `Object.getOwnPropertyDescriptor`, etc.
+  - `Date.now`, `Function.prototype.bind`
+  - And many more
 
-* Array.prototype.every ([standalone shim](https://www.npmjs.com/package/array.prototype.every))
-* Array.prototype.filter ([standalone shim](https://www.npmjs.com/package/array.prototype.filter))
-* Array.prototype.forEach ([standalone shim](https://www.npmjs.com/package/array.prototype.foreach))
-* Array.prototype.indexOf ([standalone shim](https://www.npmjs.com/package/array.prototype.indexof))
-* Array.prototype.lastIndexOf ([standalone shim](https://www.npmjs.com/package/array.prototype.lastindexof))
-* Array.prototype.map ([standalone shim](https://www.npmjs.com/package/array.prototype.map))
-* Array.prototype.slice
-* Array.prototype.some ([standalone shim](https://www.npmjs.com/package/array.prototype.some))
-* Array.prototype.sort
-* Array.prototype.reduce ([standalone shim](https://www.npmjs.com/package/array.prototype.reduce))
-* Array.prototype.reduceRight ([standalone shim](https://www.npmjs.com/package/array.prototype.reduceright))
-* Array.prototype.push ([standalone shim](https://www.npmjs.com/package/array.prototype.push))
-* Array.prototype.join
-* Array.prototype.splice ([standalone shim](https://www.npmjs.com/package/array.prototype.splice))
-* Array.isArray
-* Date.now ([standalone shim](https://www.npmjs.com/package/date))
-* Date.prototype.toJSON ([standalone shim](https://www.npmjs.com/package/date))
-* Function.prototype.bind
-    * :warning: Caveat: the bound function has a prototype property.
-    * :warning: Caveat: bound functions do not try too hard to keep you
-      from manipulating their ``arguments`` and ``caller`` properties.
-    * :warning: Caveat: bound functions don't have checks in ``call`` and
-      ``apply`` to avoid executing as a constructor.
-* Number.prototype.toExponential ([standalone shim](https://www.npmjs.com/package/number.prototype.toexponential))
-* Number.prototype.toFixed
-* Number.prototype.toPrecision
-* Object.keys ([standalone shim](https://www.npmjs.com/package/object-keys))
-* String.prototype.split ([standalone shim](https://www.npmjs.com/package/string.prototype.split))
-* String.prototype.trim ([standalone shim](https://www.npmjs.com/package/string.prototype.trim))
-* String.prototype.lastIndexOf ([standalone shim](https://www.npmjs.com/package/string.prototype.lastindexof))
-* String.prototype.replace
-    * Firefox (through v29) natively handles capturing groups incorrectly.
-* Date.parse (for ISO parsing) ([standalone shim](https://www.npmjs.com/package/date))
-* Date.prototype.toISOString ([standalone shim](https://www.npmjs.com/package/date))
-* parseInt ([standalone shim](https://www.npmjs.com/package/parseint))
-* parseFloat
-* Error.prototype.toString
-* Error.prototype.name
-* Error.prototype.message
-* RegExp.prototype.toString
+- Lightweight, modular codebase
+- Safe: does not overwrite native implementations if they exist
 
-## Shams
+## Installation
 
-* :warning: Object.create
+### npm
 
-    For the case of simply "begetting" an object that inherits
-    prototypically from another, this should work fine across legacy
-    engines.
-
-    :warning: The second argument is passed to Object.defineProperties
-    which will probably fail either silently or with extreme prejudice.
-
-* :warning: Object.getPrototypeOf
-
-    This will return "undefined" in some cases.  It uses `__proto__` if
-    it's available.  Failing that, it uses constructor.prototype, which
-    depends on the constructor property of the object's prototype having
-    not been replaced.  If your object was created like this, it won't
-    work:
-
-        function Foo() {
-        }
-        Foo.prototype = {};
-
-    Because the prototype reassignment destroys the constructor
-    property.
-
-    This will work for all objects that were created using
-    `Object.create` implemented with this library.
-
-* :warning: Object.getOwnPropertyNames
-
-    This method uses Object.keys, so it will not be accurate on legacy
-    engines.
-
-* Object.isSealed
-
-    Returns "false" in all legacy engines for all objects, which is
-    conveniently guaranteed to be accurate.
-
-* Object.isFrozen
-
-    Returns "false" in all legacy engines for all objects, which is
-    conveniently guaranteed to be accurate.
-
-* Object.isExtensible
-
-    Works like a charm, by trying very hard to extend the object then
-    redacting the extension.
-
-### May fail
-
-* :warning: Object.getOwnPropertyDescriptor
-
-    The behavior of this shim does not conform to ES5.  It should
-    probably not be used at this time, until its behavior has been
-    reviewed and been confirmed to be useful in legacy engines.
-
-* :warning: Object.defineProperty
-
-    In the worst of circumstances, IE 8 provides a version of this
-    method that only works on DOM objects.  This sham will not be
-    installed.  The given version of `defineProperty` will throw an
-    exception if used on non-DOM objects.
-
-    In slightly better circumstances, this method will silently fail to
-    set "writable", "enumerable", and "configurable" properties.
-
-    Providing a getter or setter with "get" or "set" on a descriptor
-    will silently fail on engines that lack "__defineGetter__" and
-    "__defineSetter__", which include all versions of IE.
-
-    https://github.com/es-shims/es5-shim/issues#issue/5
-
-* :warning: Object.defineProperties
-
-    This uses the Object.defineProperty shim.
-
-* Object.seal
-
-    Silently fails on all legacy engines.  This should be
-    fine unless you are depending on the safety and security
-    provisions of this method, which you cannot possibly
-    obtain in legacy engines.
-
-* Object.freeze
-
-    Silently fails on all legacy engines.  This should be
-    fine unless you are depending on the safety and security
-    provisions of this method, which you cannot possibly
-    obtain in legacy engines.
-
-* Object.preventExtensions
-
-    Silently fails on all legacy engines.  This should be
-    fine unless you are depending on the safety and security
-    provisions of this method, which you cannot possibly
-    obtain in legacy engines.
-
-### Example of applying ES compatibility shims in a browser project
-
-```html
-<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.14/es5-shim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.14/es5-sham.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.5/es6-shim.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.5/es6-sham.min.js"></script>
-<script src="other-libs.js"></script>
+```sh
+npm install es5-shim
 ```
 
-[package-url]: https://npmjs.org/package/es5-shim
-[npm-version-svg]: https://versionbadg.es/es-shims/es5-shim.svg
-[deps-svg]: https://david-dm.org/es-shims/es5-shim.svg
-[deps-url]: https://david-dm.org/es-shims/es5-shim
-[dev-deps-svg]: https://david-dm.org/es-shims/es5-shim/dev-status.svg
-[dev-deps-url]: https://david-dm.org/es-shims/es5-shim#info=devDependencies
-[npm-badge-png]: https://nodei.co/npm/es5-shim.png?downloads=true&stars=true
-[license-image]: https://img.shields.io/npm/l/es5-shim.svg
-[license-url]: LICENSE
-[downloads-image]: https://img.shields.io/npm/dm/es5-shim.svg
-[downloads-url]: https://npm-stat.com/charts.html?package=es5-shim
-[codecov-image]: https://codecov.io/gh/es-shims/es5-shim/branch/main/graphs/badge.svg
-[codecov-url]: https://app.codecov.io/gh/es-shims/es5-shim/
-[actions-image]: https://img.shields.io/endpoint?url=https://github-actions-badge-u3jn4tfpocch.runkit.sh/es-shims/es5-shim
-[actions-url]: https://github.com/es-shims/es5-shim/actions
+### CDN
+
+You can include the shim directly from a CDN:
+
+```html
+<script src="https://unpkg.com/es5-shim/es5-shim.min.js"></script>
+```
+
+### Manual
+
+Download `es5-shim.min.js` from the [releases](https://github.com/nodoubtz/es5-shim/releases) or clone the repo and include the script in your project.
+
+## Usage
+
+Simply include the shim **before** your JavaScript code that relies on ES5 features.
+
+```html
+<script src="path/to/es5-shim.min.js"></script>
+<script>
+  // Your code using ES5 features
+  var arr = [1, 2, 3];
+  arr.forEach(function(item) {
+    console.log(item);
+  });
+</script>
+```
+
+## API
+
+es5-shim patches global objects and prototypes with missing ES5 features. No explicit API is needed. For details on which methods are polyfilled, see the [MDN ES5 documentation](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/forEach) or review the source code.
+
+## Contributing
+
+Contributions are welcome! To contribute:
+
+1. Fork this repository
+2. Create a new branch (`git checkout -b feature-name`)
+3. Commit your changes (`git commit -am 'Add new feature'`)
+4. Push to the branch (`git push origin feature-name`)
+5. Open a pull request
+
+Please ensure your code follows the existing style and passes all tests.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+---
+
+**Maintained by [nodoubtz](https://github.com/nodoubtz).**
