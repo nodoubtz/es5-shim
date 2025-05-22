@@ -1,0 +1,57 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [ nodoubtz-patch-1 ]
+  pull_request:
+    branches: [ nodoubtz-patch-1 ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lint code
+        run: |
+          if [ -f ./node_modules/.bin/eslint ]; then
+            npm run lint || ./node_modules/.bin/eslint . || echo "No lint script found"
+          else
+            echo "ESLint not installed."
+          fi
+
+      - name: Run tests with coverage
+        run: |
+          if npm run | grep -q coverage; then
+            npm run coverage
+          else
+            npm test
+          fi
+
+      - name: Upload coverage report
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
+
+      # --- ADD YOUR DEPLOYMENT STEP BELOW ---
+      # Example for GitHub Pages:
+            - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/nodoubtz-patch-1' && github.event_name == 'push'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build # or ./docs or your output directory
